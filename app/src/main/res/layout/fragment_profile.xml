@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/main_bg"
+    tools:context=".profile">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/avatar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/icon_profile"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="30dp"
+            />
+
+        <TableLayout
+            android:id="@+id/table_me"
+            android:layout_below="@id/avatar"
+            android:layout_marginTop="30dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="200dp"
+            android:layout_marginHorizontal="@dimen/main_window_table_margin_horizontal">
+
+            <TableRow
+                >
+                <TextView
+                    android:layout_height="match_parent"
+                    android:layout_width="wrap_content"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/h2"
+                    android:text="ФИО:"
+                    />
+
+                <TextView
+                    android:id="@+id/FCs"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/h2"
+                    android:gravity="center_vertical"
+                    android:text="Иванов Иван Иванович"
+                    android:layout_marginStart="@dimen/main_window_table_text_margin_start"
+                    android:maxWidth="@dimen/main_window_table_text_max_w"
+                    />
+            </TableRow>
+
+            <TableRow
+                android:layout_marginTop="15dp">
+                <TextView
+                    android:layout_height="match_parent"
+                    android:layout_width="wrap_content"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/h2"
+                    android:text="Должность:"
+                    />
+
+                <TextView
+                    android:id="@+id/position"
+                    android:layout_height="match_parent"
+                    android:layout_width="match_parent"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/h2"
+                    android:gravity="center_vertical"
+                    android:text="Старший разработчик"
+                    android:layout_marginStart="@dimen/main_window_table_text_margin_start"
+                    android:maxWidth="@dimen/main_window_table_text_max_w"
+                    />
+            </TableRow>
+
+            <TableRow
+                android:layout_marginTop="15dp">
+                <TextView
+                    android:layout_height="match_parent"
+                    android:layout_width="wrap_content"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/h2"
+                    android:text="Почта:"
+                    />
+
+                <TextView
+                    android:id="@+id/login"
+                    android:layout_height="match_parent"
+                    android:layout_width="match_parent"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/h2"
+                    android:gravity="center_vertical"
+                    android:text="example@asdsa.ru"
+                    android:layout_marginStart="@dimen/main_window_table_text_margin_start"
+                    android:maxWidth="@dimen/main_window_table_text_max_w"
+                    />
+            </TableRow>
+
+            <TableRow
+                android:layout_marginTop="15dp">
+                <TextView
+                    android:layout_height="match_parent"
+                    android:layout_width="wrap_content"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/h2"
+                    android:text="Специфика:"
+                    />
+
+                <ScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scrollbars="vertical"
+                    android:visibility="visible"
+                    android:minHeight="25dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical" />
+                </ScrollView>
+
+
+            </TableRow>
+        </TableLayout>
+
+        <ImageButton
+            android:id="@+id/btn_about"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_baseline_info_24"
+            android:background="@null"
+            android:layout_below="@id/table_me"
+            android:layout_marginTop="30dp"
+            android:layout_marginEnd="45dp"
+            android:layout_alignParentRight="true"/>
+
+
+        <ImageButton
+            android:id="@+id/btn_emploee"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_baseline_people_24"
+            android:background="@null"
+            android:layout_below="@id/table_me"
+            android:layout_marginTop="30dp"
+            android:layout_marginStart="45dp"
+            android:layout_alignParentLeft="true"/>
+
+        <ImageButton
+            android:id="@+id/btn_tasks"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/table_me"
+            android:layout_marginStart="64dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginEnd="64dp"
+            android:layout_toStartOf="@+id/btn_about"
+            android:layout_toEndOf="@id/btn_emploee"
+            android:background="@null"
+            android:src="@drawable/ic_baseline_add_task_24" />
+    </RelativeLayout>
+
+</FrameLayout>

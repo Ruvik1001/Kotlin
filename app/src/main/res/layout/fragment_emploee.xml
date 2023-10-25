@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/main_bg"
+    tools:context=".Emploee">
+
+    <ScrollView
+        android:id="@+id/lst_emploee"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="30dp">
+
+        <LinearLayout
+            android:id="@+id/liner_empl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="30dp"
+            android:layout_gravity="center_horizontal"
+            android:divider="@drawable/divider_invisible"
+            android:showDividers="middle">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="@dimen/h1"
+                android:text="@string/emploee_label"
+                android:layout_gravity="center_horizontal"/>
+
+
+        </LinearLayout>
+
+    </ScrollView>
+
+
+
+</FrameLayout>

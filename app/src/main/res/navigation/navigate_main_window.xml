@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigate"
+    app:startDestination="@id/profile">
+
+    <fragment
+        android:id="@+id/profile"
+        android:name="com.example.kotlin.profile"
+        android:label="fragment_profile"
+        tools:layout="@layout/fragment_profile" >
+        <action
+            android:id="@+id/action_profile_to_emploee"
+            app:destination="@id/emploee" />
+        <action
+            android:id="@+id/action_profile_to_about"
+            app:destination="@id/about" />
+        <action
+            android:id="@+id/action_profile_to_tasks"
+            app:destination="@id/tasks" />
+    </fragment>
+    <fragment
+        android:id="@+id/about"
+        android:name="com.example.kotlin.About"
+        android:label="fragment_about"
+        tools:layout="@layout/fragment_about" />
+    <fragment
+        android:id="@+id/emploee"
+        android:name="com.example.kotlin.Emploee"
+        android:label="fragment_emploee"
+        tools:layout="@layout/fragment_emploee" />
+    <fragment
+        android:id="@+id/tasks"
+        android:name="com.example.kotlin.Tasks"
+        android:label="fragment_tasks"
+        tools:layout="@layout/fragment_tasks" />
+</navigation>

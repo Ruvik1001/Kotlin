@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "10299135090",
+    "firebase_url": "https://docassistant-4b1a1-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "docassistant-4b1a1",
+    "storage_bucket": "docassistant-4b1a1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:10299135090:android:a4e1f41cc26a18deda9eeb",
+        "android_client_info": {
+          "package_name": "com.example.kotlin"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBAViJtSggWiiLSIEG4leRGQGEomYW51FI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
