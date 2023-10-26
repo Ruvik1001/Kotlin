@@ -18,30 +18,36 @@ class DBSupport(private val context: Context) {
     private val dbVersion = 1
     private var currentTableName: String = ""
 
-    // Внутренний класс для управления базой данных
-    private inner class DBHelper(context: Context) : SQLiteOpenHelper(context, dbName, null, dbVersion) {
+    private inner class DBHelper(context: Context, val filed: List<Pair<String, String>>) : SQLiteOpenHelper(context, dbName, null, dbVersion) {
         override fun onCreate(db: SQLiteDatabase) {
-            // Создание таблицы (вызывается, если база данных не существует)
-            db.execSQL("CREATE TABLE IF NOT EXISTS $currentTableName (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, age INTEGER)")
+            var command = "CREATE TABLE IF NOT EXISTS $currentTableName (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, age INTEGER)"
+            for (pair in filed) {
+                command += ", " + pair.first + " " + pair.second
+            }
+            command += ")"
+            db.execSQL(command)
         }
 
         override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-            // Обработка обновления базы данных (например, изменение схемы таблицы)
+            db.execSQL("DROP TABLE IF EXISTS $currentTableName")
+            onCreate(db)
         }
     }
 
-    private val dbHelper = DBHelper(context)
+    private var dbHelper: DBHelper? = null
     private var database: SQLiteDatabase? = null
 
-    fun selectTable(tableName: String) {
+    fun selectTable(tableName: String, filed: List<Pair<String, String>>) {
         currentTableName = tableName
-        database = dbHelper.writableDatabase
+        dbHelper = DBHelper(context, filed)
+        database = dbHelper!!.writableDatabase
     }
 
     fun clearSelectedTable() {
-        val db = dbHelper.writableDatabase
-        db.delete(currentTableName, null, null)
-        db.close()
+        val db = dbHelper?.writableDatabase
+        if (db != null) {
+            dbHelper?.onUpgrade(db, 1, 1)
+        }
     }
 
     fun getAllDataFromCurrentTable(): List<List<String>> {
@@ -132,7 +138,6 @@ class DBSupport(private val context: Context) {
         fileInputStream.close()
     }
 
-
     fun loadFromResourceArray(resId: Int, columnsCount: Int, clear: Boolean = false) {
         if (clear) {
             clearSelectedTable()
@@ -158,6 +163,5 @@ class DBSupport(private val context: Context) {
             eventType = parser.next()
         }
     }
-
 
 }

@@ -1,6 +1,8 @@
-package com.example.kotlin.generators
+package com.example.kotlin.algorithms
 
-class Generators {
+import java.security.MessageDigest
+
+class Algorithms {
     fun encrypt(text: String, _deep: Int = 3): String {
         var coded = ""
         val key = 0x8A9B
@@ -21,5 +23,16 @@ class Generators {
         }
 
         return coded
+    }
+
+    fun sha256(input: String): String {
+        val bytes = input.toByteArray()
+        val md = MessageDigest.getInstance("SHA-256")
+        val digest = md.digest(bytes)
+        return digest.joinToString("") { "%02x".format(it) }
+    }
+
+    fun kombi(input: String): String {
+        return sha256(encrypt(input))
     }
 }
