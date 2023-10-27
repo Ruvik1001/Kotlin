@@ -20,7 +20,7 @@ class DBSupport(private val context: Context) {
 
     private inner class DBHelper(context: Context, val filed: List<Pair<String, String>>) : SQLiteOpenHelper(context, dbName, null, dbVersion) {
         override fun onCreate(db: SQLiteDatabase) {
-            var command = "CREATE TABLE IF NOT EXISTS $currentTableName (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, age INTEGER)"
+            var command = "CREATE TABLE IF NOT EXISTS $currentTableName (id INTEGER PRIMARY KEY AUTOINCREMENT"
             for (pair in filed) {
                 command += ", " + pair.first + " " + pair.second
             }
@@ -48,6 +48,25 @@ class DBSupport(private val context: Context) {
         if (db != null) {
             dbHelper?.onUpgrade(db, 1, 1)
         }
+    }
+
+    fun recordExists(columnName: String, valueToCheck: String): Boolean {
+        val query = "SELECT $columnName FROM $currentTableName WHERE $columnName = ?"
+        val cursor = database?.rawQuery(query, arrayOf(valueToCheck))
+
+        cursor?.use {
+            if (it.moveToFirst())
+                return it.count > 0
+        }
+
+        return false
+    }
+
+    fun deleteRecordsByColumnValue(columnName: String, value: String, operator: String = "=") {
+        val whereClause = "$columnName " + operator + " ?"
+        val whereArgs = arrayOf(value)
+
+        database?.delete(currentTableName, whereClause, whereArgs)
     }
 
     fun getAllDataFromCurrentTable(): List<List<String>> {

@@ -7,12 +7,14 @@ import android.content.DialogInterface
 class AlertDialog {
     fun createCustomDialog(
         context: Context,
-        title: String,
-        message: String,
-        buttonCount: Int,
-        buttonLabels: Array<String>,
-        buttonActions: Array<() -> Unit>
+        title: String = "",
+        message: String = "",
+        buttonCount: Int = 1,
+        buttonLabels: Array<String> = arrayOf("Ок"),
+        buttonActions: Array<() -> Unit> = arrayOf({})
     ) {
+        if (context == null)
+            return
         val builder = AlertDialog.Builder(context)
         builder.setTitle(title)
         builder.setMessage(message)

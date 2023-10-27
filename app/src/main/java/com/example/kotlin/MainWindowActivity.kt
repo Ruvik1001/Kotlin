@@ -3,10 +3,6 @@ package com.example.kotlin
 import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.ImageButton
-import androidx.fragment.app.Fragment
-import com.example.kotlin.databinding.ActivityMainWindowBinding
-import com.example.kotlin.Support
 
 class MainWindowActivity : AppCompatActivity(), Support {
     @SuppressLint("ResourceType")
@@ -18,7 +14,7 @@ class MainWindowActivity : AppCompatActivity(), Support {
     override fun OnTasksButtonClicked() {
         val fragmentManager = supportFragmentManager
         val transaction = fragmentManager.beginTransaction()
-        transaction.replace(R.id.MainWindowFragmentContainerView, Tasks())
+        transaction.replace(R.id.MainWindowFragmentContainerView, Job())
         transaction.addToBackStack(null);
         transaction.commit()
     }

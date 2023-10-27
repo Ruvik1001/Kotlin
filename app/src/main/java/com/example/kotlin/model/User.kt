@@ -1,4 +1,4 @@
-package com.example.kotlin.user
+package com.example.kotlin.model
 
 class User(
     private var login: String = "",

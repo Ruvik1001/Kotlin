@@ -6,12 +6,15 @@ import android.graphics.Paint
 import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.core.view.marginBottom
+import com.example.kotlin.database.local.DBSupport
+import com.example.kotlin.database.remote.DBFirebase
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -28,6 +31,9 @@ class Emploee : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
 
+    private lateinit var localDB: DBSupport
+    private lateinit var view: View
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -36,15 +42,47 @@ class Emploee : Fragment() {
         }
     }
 
-    @SuppressLint("UseCompatLoadingForDrawables")
+    @SuppressLint("UseCompatLoadingForDrawables", "SetTextI18n")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_emploee, container, false)
+        view = inflater.inflate(R.layout.fragment_emploee, container, false)
+
+        val tableName = GlobalArgs().UserTableName
+        val filed = GlobalArgs().UserFiled
+
+        localDB = DBSupport(requireContext())
+        localDB.selectTable(tableName, filed)
+
+        DBFirebase().getAllUsers {
+            if (it != null) {
+                for (user in it) {
+                    if (localDB.recordExists(filed[0].first, user.getLogin()))
+                        continue
+
+                    localDB.addDataToCurrentTable(listOf<Pair<String,String>>(
+                        Pair(filed[0].first, user.getLogin()),
+                        Pair(filed[1].first, user.getPassword()),
+                        Pair(filed[2].first, user.getName()),
+                        Pair(filed[3].first, user.getLastName()),
+                        Pair(filed[4].first, user.getPatronymic()),
+                        Pair(filed[5].first, user.getPost()),
+                        Pair(filed[6].first, user.getTelephone()),
+                    ))
+                }
+                update()
+            }
+        }
+        update()
+        return view
+    }
+
+    fun update() {
         val emps = view.findViewById<LinearLayout>(R.id.liner_empl)
-        for (i in 0..30) {
+        emps.removeAllViews()
+        for (user in localDB.getAllDataFromCurrentTable()) {
 
             val table = TableLayout(this.context)
             table.background = resources.getDrawable(R.drawable.back)
@@ -64,7 +102,7 @@ class Emploee : Fragment() {
             FCs.setTextColor(resources.getColor(R.color.black))
             FCs.textSize = 18f
             FCs.maxWidth = resources.getDimension(R.dimen.main_window_table_text_max_w).toInt()
-            FCs.text = "Иванов Иван Иванович"
+            FCs.text = user[4] + " " + user[3] + " " + user[5]
             FCs.setPadding(20,10,20,10)
             row_name.addView(FCs)
 
@@ -84,7 +122,7 @@ class Emploee : Fragment() {
             position.setTextColor(resources.getColor(R.color.black))
             position.textSize = 18f
             position.maxWidth = resources.getDimension(R.dimen.main_window_table_text_max_w).toInt()
-            position.text = "Участник тестирования DA"
+            position.text = user[6]
             position.setPadding(20,10,20,10)
             row_position.addView(position)
 
@@ -105,7 +143,7 @@ class Emploee : Fragment() {
             email.textSize = 18f
             email.maxWidth = resources.getDimension(R.dimen.text_max_w).toInt()
             var ref = String()
-            ref = "rudnevvictor2003@mail.ru"
+            ref = user[1]
             email.text = ref
             email.paintFlags = Paint.UNDERLINE_TEXT_FLAG
             email.setOnClickListener {
@@ -137,7 +175,7 @@ class Emploee : Fragment() {
             phone.setTextColor(resources.getColor(R.color.white_blue))
             phone.textSize = 18f
             phone.maxWidth = resources.getDimension(R.dimen.main_window_table_text_max_w).toInt()
-            phone.text = "+1(111)111-11-11"
+            phone.text = user[7]
             phone.paintFlags = Paint.UNDERLINE_TEXT_FLAG
             phone.setOnClickListener { startActivity(Intent(Intent.ACTION_CALL, Uri.parse("tel:"+phone.text))) }
             phone.setPadding(20,10,20,10)
@@ -152,8 +190,12 @@ class Emploee : Fragment() {
         val save_zone = TextView(this.context)
         save_zone.setText("\n\n\n")
         emps.addView(save_zone)
+    }
 
-        return view
+    override fun onDestroy() {
+        super.onDestroy()
+        val localDB = DBSupport(requireContext())
+        localDB.deleteRecordsByColumnValue("id", "1", ">")
     }
 
     companion object {

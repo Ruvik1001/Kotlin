@@ -5,80 +5,70 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import com.example.kotlin.algorithms.Algorithms
 import com.example.kotlin.database.local.DBSupport
 import com.example.kotlin.database.remote.DBFirebase
 import com.example.kotlin.databinding.ActivityLoginBinding
 import com.example.kotlin.dialog.AlertDialog
-import com.example.kotlin.user.User
+import com.example.kotlin.model.User
 
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
     private var remouteDB: DBFirebase = DBFirebase()
+    private var connected: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        remouteDB.connected() {
+            connected = it
+            dbg.createLogI("Firebase connected: " + connected.toString())
+        }
+
         binding.forgotPassword.setOnClickListener {
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/Viktor1001")))
         }
 
         binding.btnLogin.setOnClickListener {
-//            if (!remouteDB.connected()) {
-//                AlertDialog().createCustomDialog(
-//                    this,
-//                    "Ошибка подключения!",
-//                    "Проверьте подключение к интернету",
-//                    1,
-//                    arrayOf("Ок"),
-//                    arrayOf({})
-//                )
-//                return@setOnClickListener
-//            }
-            remouteDB.auth(binding.loginLog.text.toString(), binding.loginPassword.text.toString()) {
-                if (it != null) {
-                    //addUserToLocal(it)
+            if (!isFinishing && !isDestroyed) {
+                if (!connected) {
                     AlertDialog().createCustomDialog(
                         this,
-                        "!",
-                        (it.getLogin() + " " + it.getPassword() + " " + it.getName() + " " + it.getLastName() + " " + it.getPatronymic() + " " + it.getPost() + " " + it.getTelephone()),
-                        1,
-                        arrayOf("Ок"),
-                        arrayOf({})
+                        "Ошибка подключения!",
+                        "Проверьте подключение к интернету"
                     )
-                    val intent = Intent(this, MainWindowActivity::class.java)
-                    startActivity(intent)
-                    //finish()
-                    return@auth
-                }
-                else {
-                    AlertDialog().createCustomDialog(
-                        this,
-                        "Ошибка вохода!",
-                        "Пожалуйста, проверьте правильность введённых данных.",
-                        1,
-                        arrayOf("Ок"),
-                        arrayOf({})
-                    )
-                    return@auth
-                }
+
+                } else
+                    auth()
             }
 
         }
-        remouteDB.addUser(
-            "ruvik1001@gmail.com",
-            "Gfhjkm007q",
-            "Viktor",
-            "Rudnev",
-            "Vladimirovich",
-            "Engenear",
-            "+1(111)111-11-11"
-            ) {}
-
     }
+
+    fun auth() {
+        remouteDB.auth(binding.loginLog.text.toString(), binding.loginPassword.text.toString()) {
+            if (!isFinishing && !isDestroyed) {
+                if (it == null) {
+                    AlertDialog().createCustomDialog(
+                        this,
+                        "Ошибка входа!",
+                        "Пожалуйста, проверьте правильность введённых данных."
+                    )
+                    return@auth
+                }
+
+                addUserToLocal(it)
+                val intent = Intent(this, MainWindowActivity::class.java)
+                startActivity(intent)
+                finish()
+            }
+        }
+    }
+
+
+
 
     fun addUserToLocal(user: User) {
         val localDB = DBSupport(this)
@@ -95,5 +85,9 @@ class LoginActivity : AppCompatActivity() {
             Pair(filed[5].first, user.getPost()),
             Pair(filed[6].first, user.getTelephone()),
         ))
+        val t = localDB.getAllDataFromCurrentTable()
+        for (row in t)
+            for (elem in row)
+                Log.d("MyTag", elem)
     }
 }

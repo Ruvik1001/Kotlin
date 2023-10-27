@@ -41,14 +41,5 @@
     <string name="forgot_pass_url"><u>Забыли пароль?</u></string>
     <string name="tasks_label">Задачи</string>
 
-    <string-array name="spec">
-        <item>фффы фвыф</item>
-        <item>фффы фвыф</item>
-        <item>фффы фвыф</item>
-        <item>фффы фвыф</item>
-        <item>фффы фвыф</item>
-        <item>фффы фвыф</item>
-        <item>фффы фвыф</item>
-    </string-array>
 
 </resources>
