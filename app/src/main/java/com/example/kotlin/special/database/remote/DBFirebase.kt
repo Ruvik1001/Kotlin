@@ -21,7 +21,7 @@ class DBFirebase {
     private var database = Firebase.database
 
     init {
-        FirebaseDatabase.getInstance().setLogLevel(Logger.Level.DEBUG)
+       // FirebaseDatabase.getInstance().setLogLevel(Logger.Level.DEBUG)
     }
     ////////////////////ADD////////////////////
 
