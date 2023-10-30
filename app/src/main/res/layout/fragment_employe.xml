@@ -4,31 +4,30 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/main_bg"
-    android:id="@+id/Tasks"
-    tools:context=".activity.fragment.job.Job">
+    tools:context=".activity.fragment.employe.Employee">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <TextView
-            android:id="@+id/tasks_label"
+            android:id="@+id/emploee_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/black"
             android:textSize="@dimen/h1"
-            android:text="@string/tasks_label"
+            android:text="@string/emploee_label"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="15dp"/>
 
         <ScrollView
-            android:id="@+id/lst_tasks"
+            android:id="@+id/lst_emploee"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginBottom="30dp"
-            android:layout_below="@id/tasks_label">
+            android:layout_below="@id/emploee_label">
 
             <LinearLayout
-                android:id="@+id/liner_tasks"
+                android:id="@+id/liner_empl"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
@@ -46,7 +45,5 @@
         </ScrollView>
 
     </RelativeLayout>
-
-
 
 </FrameLayout>

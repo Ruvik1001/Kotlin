@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/main_bg"
-    tools:context=".About">
+    tools:context=".activity.fragment.about.About">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -33,12 +33,13 @@
                     android:text="@string/about_label"/>
 
                 <TextView
+                    android:id="@+id/text_about"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:maxWidth="@dimen/text_max_w"
                     android:textColor="@color/black"
                     android:textSize="@dimen/h2"
-                    android:text="@string/about_main_text"
+                    android:text="Loading..."
                     android:layout_marginTop="30dp"
                     android:layout_marginBottom="30dp"/>
 
