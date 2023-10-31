@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.kotlin.R
 import com.example.kotlin.special.database.local.DBSupport
 import com.example.kotlin.special.global.GlobalArgs
+import org.koin.android.ext.android.inject
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -31,8 +32,8 @@ class About : Fragment() {
     private var param2: String? = null
 
     private lateinit var view: View
-    private lateinit var localDB: DBSupport
-    private lateinit var global: GlobalArgs
+    private val localDB: DBSupport by inject()
+    private val global: GlobalArgs by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,9 +50,6 @@ class About : Fragment() {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_about, container, false)
 
-        global = GlobalArgs()
-
-        localDB = DBSupport(requireContext())
         localDB.selectTable(global.AboutTableName, global.AboutFiled)
         localDB.clearSelectedTable()
 

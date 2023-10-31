@@ -13,6 +13,7 @@ import com.example.kotlin.R
 import com.example.kotlin.special.support.SupportLinking
 import com.example.kotlin.special.database.local.DBSupport
 import com.example.kotlin.special.global.GlobalArgs
+import org.koin.android.ext.android.inject
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -31,7 +32,7 @@ class Profile : Fragment() {
 
     private lateinit var supportLinking: SupportLinking
     private lateinit var view: View
-    private lateinit var localDB: DBSupport
+    private val localDB: DBSupport by inject()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,7 +53,6 @@ class Profile : Fragment() {
         val tableName = GlobalArgs().UserTableName
         val filed = GlobalArgs().UserFiled
 
-        localDB = DBSupport(requireContext())
         localDB.selectTable(tableName, filed)
 
         setData()

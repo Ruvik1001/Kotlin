@@ -18,19 +18,22 @@ import com.example.kotlin.special.dialog.AlertDialog
 import com.example.kotlin.special.global.GlobalArgs
 import com.example.kotlin.special.model.User
 import com.example.kotlin.worker.DailyReminderWorker
+import org.koin.android.ext.android.inject
+import org.koin.core.parameter.parametersOf
 import java.util.concurrent.TimeUnit
 
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
     private lateinit var viewModel: LoginViewModel
+    private val loginViewModelFactory: LoginViewModelFactory by inject{ parametersOf(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        viewModel = ViewModelProvider(this, LoginViewModelFactory(this))
+        viewModel = ViewModelProvider(this, loginViewModelFactory)
             .get(LoginViewModel::class.java)
 
 

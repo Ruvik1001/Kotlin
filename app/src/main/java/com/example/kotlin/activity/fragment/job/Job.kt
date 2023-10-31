@@ -16,6 +16,8 @@ import com.example.kotlin.data.TaskData
 import com.example.kotlin.special.database.local.DBSupport
 import com.example.kotlin.special.database.remote.DBFirebase
 import com.example.kotlin.special.global.GlobalArgs
+import org.koin.android.ext.android.inject
+import org.koin.core.parameter.parametersOf
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -34,6 +36,7 @@ class Job : Fragment() {
 
     private lateinit var view: View
     private lateinit var jobViewModel: JobViewModel
+    private val jobViewModelFactory: JobViewModelFactory by inject { parametersOf(requireActivity()) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,7 +52,7 @@ class Job : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_tasks, container, false)
-        jobViewModel = ViewModelProvider(this, JobViewModelFactory(requireContext(), viewLifecycleOwner)).get(JobViewModel::class.java)
+        jobViewModel = ViewModelProvider(this, jobViewModelFactory).get(JobViewModel::class.java)
 
         jobViewModel.taskData.observe(viewLifecycleOwner) {
             update(it)

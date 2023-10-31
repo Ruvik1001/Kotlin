@@ -1,7 +1,6 @@
 package com.example.kotlin.activity.fragment.employe
 
 import android.content.Context
-import android.provider.SyncStateContract.Helpers.update
 import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
@@ -14,32 +13,36 @@ import com.example.kotlin.special.database.local.DBSupport
 import com.example.kotlin.special.database.remote.DBFirebase
 import com.example.kotlin.special.debug.DBG
 import com.example.kotlin.special.global.GlobalArgs
+import org.koin.java.KoinJavaComponent.inject
+
 
 class EmployeeViewModel(
     private val context: Context,
     private val owner: LifecycleOwner) : ViewModel() {
-    private val localDB: DBSupport = DBSupport(context)
-    private val global: GlobalArgs = GlobalArgs()
-    private lateinit var filed: List<Pair<String, String>>
-    private lateinit var tableName: String
-    private lateinit var firebaseLiveData: FirebaseLiveData
+    private val localDB: DBSupport by inject(DBSupport::class.java)
+    private val global: GlobalArgs by inject(GlobalArgs::class.java)
+    private var filed: List<Pair<String, String>>
+    private var tableName: String
+    private val firebaseLiveData: FirebaseLiveData by inject(FirebaseLiveData::class.java)
     private val employeeList = MutableLiveData<List<EmployeeData>>()
     val employeeData: LiveData<List<EmployeeData>> = employeeList
 
 
     init {
-        firebaseLiveData = FirebaseLiveData(DBFirebase())
-
         tableName = global.UserTableName
         filed = global.UserFiled
         localDB.selectTable(tableName, filed)
 
+        val currentLogin = localDB.getAllDataFromCurrentTable()[0][1]
+
         firebaseLiveData.usersData.observe(owner) {
             if (it != null) {
                 DBG().createLogI("EVM user bind was called")
-                localDB.clearSelectedTable()
+                localDB.deleteRecordsByColumnValue("id", "1", ">")
                 val lst_emp: MutableList<EmployeeData> = mutableListOf()
                 for (user in it) {
+                    if (user.getLogin() == currentLogin)
+                        continue
                     val employee: EmployeeData = EmployeeData("","","","")
                     localDB.addDataToCurrentTable(listOf<Pair<String,String>>(
                         Pair(filed[0].first, user.getLogin()),

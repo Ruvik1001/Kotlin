@@ -13,12 +13,12 @@ import com.example.kotlin.special.dialog.AlertDialog
 import com.example.kotlin.special.global.GlobalArgs
 import com.example.kotlin.special.model.User
 
-class LoginViewModelFactory(private val activity: Activity) : ViewModelProvider.Factory {
-
-    val localDB = DBSupport(activity as Context)
-    private val remoteDB = DBFirebase()
-    private val global = GlobalArgs()
-    private val fbLive = FirebaseLiveData(remoteDB)
+class LoginViewModelFactory(
+    private val activity: Activity,
+    private val localDB: DBSupport,
+    private val remoteDB: DBFirebase,
+    private val global: GlobalArgs,
+    private val fbLive: FirebaseLiveData) : ViewModelProvider.Factory {
 
     fun auth(login: String, password: String) {
         if (global.mode == 1 && login == "test" && password == "test") {

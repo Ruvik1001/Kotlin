@@ -17,13 +17,8 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
 import java.util.LinkedList
 
-class DBFirebase {
+class DBFirebase(private val algorithm: Algorithms) {
     private var database = Firebase.database
-
-    init {
-       // FirebaseDatabase.getInstance().setLogLevel(Logger.Level.DEBUG)
-    }
-    ////////////////////ADD////////////////////
 
     fun <T> addAny(tableName: String, obj: T, child: LinkedList<String>? = null) {
         var ref : DatabaseReference = database.getReference(tableName)
@@ -42,13 +37,13 @@ class DBFirebase {
         post: String,
         telephone: String,
         callback: (Boolean) -> Unit) {
-        val sha256Login = Algorithms().sha256(login)
-        val kombiPass = Algorithms().kombi(pass)
-        val encryptName = Algorithms().encrypt(name)
-        val encryptLastName = Algorithms().encrypt(last_name)
-        val encryptPatronymic = Algorithms().encrypt(patronymic)
-        val encryptPost = Algorithms().encrypt(post)
-        val encryptTelephone = Algorithms().encrypt(telephone)
+        val sha256Login = algorithm.sha256(login)
+        val kombiPass = algorithm.kombi(pass)
+        val encryptName = algorithm.encrypt(name)
+        val encryptLastName = algorithm.encrypt(last_name)
+        val encryptPatronymic = algorithm.encrypt(patronymic)
+        val encryptPost = algorithm.encrypt(post)
+        val encryptTelephone = algorithm.encrypt(telephone)
 
         findUser(sha256Login) { userExists ->
             if (userExists) {
@@ -80,12 +75,12 @@ class DBFirebase {
         status: String,
         callback: (Boolean) -> Unit
     ) {
-        val sha256Login = Algorithms().sha256(login)
-        val encryptLabel = Algorithms().encrypt(label)
-        val encryptText = Algorithms().encrypt(text)
-        val encryptDateFrom = Algorithms().encrypt(date_from)
-        val encryptDateTo = Algorithms().encrypt(date_to)
-        val encryptStatus = Algorithms().encrypt(status)
+        val sha256Login = algorithm.sha256(login)
+        val encryptLabel = algorithm.encrypt(label)
+        val encryptText = algorithm.encrypt(text)
+        val encryptDateFrom = algorithm.encrypt(date_from)
+        val encryptDateTo = algorithm.encrypt(date_to)
+        val encryptStatus = algorithm.encrypt(status)
 
         val task = Task(
             login,
@@ -127,7 +122,7 @@ class DBFirebase {
                 val child = LinkedList(
                     listOf(
                         sha256Login,
-                        Algorithms().sha256(child_ref.key ?: "ErrGenKey")
+                        algorithm.sha256(child_ref.key ?: "ErrGenKey")
                     )
                 )
                 addAny(
@@ -148,7 +143,7 @@ class DBFirebase {
     fun findUser(login: String, callback: (Boolean) -> Unit) {
         val usersRef = database.getReference(GlobalArgs().UserTableName)
 
-        val sha256Login = Algorithms().sha256(login)
+        val sha256Login = algorithm.sha256(login)
 
         usersRef.orderByChild(sha256Login).addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -172,7 +167,7 @@ class DBFirebase {
 
     fun findTasks(login: String, callback: (TasksList) -> Unit) {
         val ref = database.getReference(GlobalArgs().TaskTableName)
-        val sha256Login = Algorithms().sha256(login)
+        val sha256Login = algorithm.sha256(login)
 
         ref.orderByChild(sha256Login).addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -184,11 +179,11 @@ class DBFirebase {
                             if (task != null && task.getLogin() == login) {
                                 val decryptedTask = Task(
                                     task.getLogin(),
-                                    Algorithms().decrypt(task.getLabel()),
-                                    Algorithms().decrypt(task.getText()),
-                                    Algorithms().decrypt(task.getDateFrom()),
-                                    Algorithms().decrypt(task.getDateTo()),
-                                    Algorithms().decrypt(task.getStatus())
+                                    algorithm.decrypt(task.getLabel()),
+                                    algorithm.decrypt(task.getText()),
+                                    algorithm.decrypt(task.getDateFrom()),
+                                    algorithm.decrypt(task.getDateTo()),
+                                    algorithm.decrypt(task.getStatus())
                                 )
                                 tasks.add(decryptedTask)
                             }
@@ -242,11 +237,11 @@ class DBFirebase {
                     User(
                         user.getLogin(),
                         "null",
-                        Algorithms().decrypt(user.getName()),
-                        Algorithms().decrypt(user.getLastName()),
-                        Algorithms().decrypt(user.getPatronymic()),
-                        Algorithms().decrypt(user.getPost()),
-                        Algorithms().decrypt(user.getTelephone())
+                        algorithm.decrypt(user.getName()),
+                        algorithm.decrypt(user.getLastName()),
+                        algorithm.decrypt(user.getPatronymic()),
+                        algorithm.decrypt(user.getPost()),
+                        algorithm.decrypt(user.getTelephone())
                     )
                 }
                 callback(processedUsers)
@@ -259,7 +254,7 @@ class DBFirebase {
 
     fun getAllTasks(login: String, callback: (TasksList) -> Unit) {
         val ref = database.getReference(GlobalArgs().TaskTableName)
-        val sha256Login = Algorithms().sha256(login)
+        val sha256Login = algorithm.sha256(login)
 
         ref.orderByChild(sha256Login).addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -271,11 +266,11 @@ class DBFirebase {
                             if (task != null) {
                                 val decryptedTask = Task(
                                     task.getLogin(),
-                                    Algorithms().decrypt(task.getLabel()),
-                                    Algorithms().decrypt(task.getText()),
-                                    Algorithms().decrypt(task.getDateFrom()),
-                                    Algorithms().decrypt(task.getDateTo()),
-                                    Algorithms().decrypt(task.getStatus())
+                                    algorithm.decrypt(task.getLabel()),
+                                    algorithm.decrypt(task.getText()),
+                                    algorithm.decrypt(task.getDateFrom()),
+                                    algorithm.decrypt(task.getDateTo()),
+                                    algorithm.decrypt(task.getStatus())
                                 )
                                 tasks.add(decryptedTask)
                             }
@@ -330,8 +325,8 @@ class DBFirebase {
     fun auth(login: String, pass: String, callback: (User?) -> Unit) {
         val usersRef = database.getReference(GlobalArgs().UserTableName)
 
-        val sha256Login = Algorithms().sha256(login)
-        val kombiPass = Algorithms().kombi(pass)
+        val sha256Login = algorithm.sha256(login)
+        val kombiPass = algorithm.kombi(pass)
 
         usersRef.orderByChild(sha256Login).addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -343,11 +338,11 @@ class DBFirebase {
                                 User(
                                     user.getLogin(),
                                     "null",
-                                    Algorithms().decrypt(user.getName()),
-                                    Algorithms().decrypt(user.getLastName()),
-                                    Algorithms().decrypt(user.getPatronymic()),
-                                    Algorithms().decrypt(user.getPost()),
-                                    Algorithms().decrypt(user.getTelephone())
+                                    algorithm.decrypt(user.getName()),
+                                    algorithm.decrypt(user.getLastName()),
+                                    algorithm.decrypt(user.getPatronymic()),
+                                    algorithm.decrypt(user.getPost()),
+                                    algorithm.decrypt(user.getTelephone())
                                 )
                             )
                             usersRef.removeEventListener(this)

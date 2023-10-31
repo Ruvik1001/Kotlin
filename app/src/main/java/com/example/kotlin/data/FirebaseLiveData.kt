@@ -7,7 +7,7 @@ import com.example.kotlin.special.debug.DBG
 import com.example.kotlin.special.model.TasksList
 import com.example.kotlin.special.model.User
 
-class FirebaseLiveData(remoteDB: DBFirebase, login: String = "") {
+class FirebaseLiveData(remoteDB: DBFirebase) {
     private val connectedLiveData = MutableLiveData<Boolean>()
     val connectedData: LiveData<Boolean> = connectedLiveData
 
@@ -27,7 +27,7 @@ class FirebaseLiveData(remoteDB: DBFirebase, login: String = "") {
                         setUsers(it)
                     }
                 }
-                remoteDB.getAllTasks(login) { setTasks(it) }
+                remoteDB.getAllTasks("") { setTasks(it) }
             }
         }
     }
