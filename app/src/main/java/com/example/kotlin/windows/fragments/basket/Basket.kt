@@ -1,14 +1,13 @@
-package com.example.kotlin
+package com.example.kotlin.windows.fragments.basket
 
-import DBHelper
+import com.example.kotlin.windows.database.DBHelper
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import android.widget.*
-import androidx.navigation.fragment.findNavController
-import java.io.Console
+import com.example.kotlin.R
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -59,10 +58,10 @@ class Basket : Fragment() {
             do {
                 val id = db.getIDColValue(cursor)
                 val position = cursor.getString(cursor.getColumnIndex(DBHelper.POSITION_COl))
-                //val res_id = cursor.getInt(cursor.getColumnIndex(DBHelper.RES_ID_COL))
+                //val res_id = cursor.getInt(cursor.getColumnIndex(com.example.kotlin.windows.database.DBHelper.RES_ID_COL))
                 val cost = cursor.getDouble(cursor.getColumnIndex(DBHelper.COST_COL))
                 var count = cursor.getInt(cursor.getColumnIndex(DBHelper.COUNT_COL))
-                //val type = cursor.getString(cursor.getColumnIndex(DBHelper.TYPE_COL))
+                //val type = cursor.getString(cursor.getColumnIndex(com.example.kotlin.windows.database.DBHelper.TYPE_COL))
 
                 ////////////////////////////////////////
                 val table = TableLayout(this.context)

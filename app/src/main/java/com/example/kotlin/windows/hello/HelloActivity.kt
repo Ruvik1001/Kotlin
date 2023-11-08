@@ -1,9 +1,11 @@
-package com.example.kotlin
+package com.example.kotlin.windows.hello
 
-import DBHelper
+import com.example.kotlin.windows.database.DBHelper
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.example.kotlin.R
+import com.example.kotlin.windows.fragments.host.HostWindowActivity
 import kotlin.concurrent.thread
 
 class HelloActivity : AppCompatActivity() {
@@ -27,7 +29,7 @@ class HelloActivity : AppCompatActivity() {
         db.close()
 
         Thread.sleep(2300)
-        startActivity(Intent(this, MainWindowActivity::class.java))
+        startActivity(Intent(this, HostWindowActivity::class.java))
         finish()
     }
 }

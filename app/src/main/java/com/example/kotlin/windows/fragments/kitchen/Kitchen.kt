@@ -1,12 +1,13 @@
-package com.example.kotlin
+package com.example.kotlin.windows.fragments.kitchen
 
-import DBHelper
+import com.example.kotlin.windows.database.DBHelper
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
 import android.widget.*
 import androidx.navigation.fragment.findNavController
+import com.example.kotlin.R
 import com.mikhaellopez.circularimageview.CircularImageView
 
 // TODO: Rename parameter arguments, choose names that match
