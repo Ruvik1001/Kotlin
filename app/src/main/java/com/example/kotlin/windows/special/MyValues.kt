@@ -13,5 +13,5 @@ val productFiled = listOf<Pair<String,String>>(
 )
 
 val retrofit: Retrofit = Retrofit.Builder()
-    .baseUrl("https://raw.githubusercontent.com/")
+    .baseUrl("https://text-host.ru")
     .build()

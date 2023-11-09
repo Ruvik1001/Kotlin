@@ -5,9 +5,9 @@ import retrofit2.Call
 import retrofit2.http.GET
 
 public interface API {
-    @GET("Ruvik1001/temp/main/food")
+    @GET("/raw/food-17225")
     fun getFood(): Call<ResponseBody>
 
-    @GET("Ruvik1001/temp/main/drinks")
+    @GET("/raw/drinks-638")
     fun getDrinks(): Call<ResponseBody>
 }

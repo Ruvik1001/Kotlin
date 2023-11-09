@@ -34,7 +34,12 @@ class HelloActivity : AppCompatActivity() {
         val factory : HelloViewModelFactory by inject()
         val helloViewModel = ViewModelProvider(this, factory).get(HelloViewModel::class.java)
 
-//        startActivity(Intent(this, HostWindowActivity::class.java))
-//        finish()
+        Thread {
+            Thread.sleep(1300)
+            runOnUiThread{
+                startActivity(Intent(this, HostWindowActivity::class.java))
+                finish()
+            }
+        }.start()
     }
 }
