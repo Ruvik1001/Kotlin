@@ -22,13 +22,13 @@ class AboutViewModel() : ViewModel() {
     }
 
     interface GitHubService {
-        @GET("Ruvik1001/temp/main/README.md")
+        @GET("/raw/asdsa-3876")
         fun _load(): Call<ResponseBody>
     }
 
     fun load() {
         val retrofit = Retrofit.Builder()
-            .baseUrl("https://raw.githubusercontent.com/")
+            .baseUrl("https://text-host.ru")
             .build()
 
         val service = retrofit.create(GitHubService::class.java)
