@@ -7,174 +7,110 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
-class DBHelper(private val context: Context, factory: SQLiteDatabase.CursorFactory?) :
-    SQLiteOpenHelper(context, DATABASE_NAME, factory, DATABASE_VERSION) {
+class DBHelper(private val context: Context) {
 
-    override fun onCreate(db: SQLiteDatabase) {
-        val query = ("CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " ("
-                + ID_COL + " INTEGER PRIMARY KEY, " +
-                POSITION_COl + " TEXT," +
-                TYPE_COL + " TEXT," +
-                COST_COL + " REAL," +  // Добавляем поле COST
-                COUNT_COL + " INTEGER," +
-                RES_ID_COL + " INTEGER NULL" + ")")
-        db.execSQL(query)
-    }
+    private val dbName = "LocalDB"
+    private val dbVersion = 1
+    private var currentTableName: String = ""
 
-    fun execute(db: SQLiteDatabase, query: String) {
-        db.execSQL(query)
-    }
-
-    override fun onUpgrade(db: SQLiteDatabase, p1: Int, p2: Int) {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME)
-        onCreate(db)
-    }
-
-    fun loadFromResource(res: Int, clear: Boolean = false) {
-        if (clear == true)
-            clearTable()
-
-        val db = this.writableDatabase
-        val resources = context.resources.getStringArray(res)
-
-        for (i in 0 until resources.size step 4){
-            val position = resources[i]
-            val drawable = resources[i + 1]
-            var cost = resources[i + 2]
-            val type = resources[i + 3]
-
-            cost = cost.replace(',','.')
-
-            var drawableID = context.resources.getIdentifier(drawable, "drawable", context.packageName)
-            if (drawableID == 0)
-                drawableID = context.resources.getIdentifier("sold", "drawable", context.packageName)
-
-            addPosition(position, type, cost.toDouble(), 0, drawableID)
+    private inner class DBHelper(context: Context, val filed: List<Pair<String, String>>) : SQLiteOpenHelper(context, dbName, null, dbVersion) {
+        override fun onCreate(db: SQLiteDatabase) {
+            var command = "CREATE TABLE IF NOT EXISTS $currentTableName (id INTEGER PRIMARY KEY AUTOINCREMENT"
+            for (pair in filed) {
+                command += ", " + pair.first + " " + pair.second
+            }
+            command += ")"
+            db.execSQL(command)
         }
 
-        db.close()
+        override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+            db.execSQL("DROP TABLE IF EXISTS $currentTableName")
+            onCreate(db)
+        }
     }
 
-    fun clearTable() {
-        onUpgrade(this.writableDatabase, DATABASE_VERSION, DATABASE_VERSION)
+    private var dbHelper: DBHelper? = null
+    private var database: SQLiteDatabase? = null
+
+    fun selectTable(tableName: String, filed: List<Pair<String, String>>) {
+        currentTableName = tableName
+        dbHelper = DBHelper(context, filed)
+        database = dbHelper!!.writableDatabase
     }
 
-    fun updateFieldForAll(fieldName: String, value: String) {
-        val db = this.writableDatabase
-        val contentValues = ContentValues()
-        contentValues.put(fieldName, value)
-        db.update(TABLE_NAME, contentValues, null, null)
-        db.close()
+    fun clearSelectedTable() {
+        val db = dbHelper?.writableDatabase
+        if (db != null) {
+            dbHelper?.onUpgrade(db, 1, 1)
+        }
     }
 
-    @SuppressLint("Range")
-    fun getIDColValue(cursor: Cursor): Int {
-        return cursor.getInt(cursor.getColumnIndex(ID_COL))
+    fun recordExists(columnName: String, valueToCheck: String): Boolean {
+        val query = "SELECT $columnName FROM $currentTableName WHERE $columnName = ?"
+        val cursor = database?.rawQuery(query, arrayOf(valueToCheck))
+
+        cursor?.use {
+            if (it.moveToFirst())
+                return it.count > 0
+        }
+
+        return false
     }
 
-    fun addPosition(position: String, type: String, cost: Double, count: Int, resId: Int?) {
+    fun deleteRecordsByColumnValue(columnName: String, value: String, operator: String = "=") {
+        val whereClause = "$columnName " + operator + " ?"
+        val whereArgs = arrayOf(value)
+
+        database?.delete(currentTableName, whereClause, whereArgs)
+    }
+
+    fun getAllDataFromCurrentTable(): List<List<String>> {
+        val data = mutableListOf<List<String>>()
+        val cursor = database?.rawQuery("SELECT * FROM $currentTableName;", null)
+        cursor?.use {
+            val columnCount = cursor.columnCount
+            while (it.moveToNext()) {
+                val rowData = mutableListOf<String>()
+                for (i in 0 until columnCount) {
+                    val value = it.getString(i)
+                    rowData.add(value)
+                }
+                data.add(rowData)
+            }
+        }
+        return data
+    }
+
+
+    fun addDataToCurrentTable(data: List<Pair<String, String>>) {
         val values = ContentValues()
-        values.put(POSITION_COl, position)
-        values.put(TYPE_COL, type)
-        values.put(COST_COL, cost)
-        values.put(COUNT_COL, count)
-        values.put(RES_ID_COL, resId)
-        val db = this.writableDatabase
-        db.insert(TABLE_NAME, null, values)
-        db.close()
-    }
-
-    fun getPositions(): Cursor? {
-        val db = this.readableDatabase
-        return db.rawQuery("SELECT * FROM " + TABLE_NAME, null)
-    }
-
-    fun getPositionsByType(type: String): Cursor? {
-        val db = this.readableDatabase
-        return db.rawQuery("SELECT * FROM $TABLE_NAME WHERE $TYPE_COL = ?", arrayOf(type))
-    }
-
-    fun getRecordsWithCondition(field: String, condition: String, value: String): Cursor? {
-        val db = this.readableDatabase
-        return db.rawQuery("SELECT * FROM $TABLE_NAME WHERE $field $condition ?", arrayOf(value))
-    }
-
-
-    @SuppressLint("Range")
-    fun searchByPosition(position: String): Long? {
-        val db = this.readableDatabase
-        val cursor = db.query(
-            TABLE_NAME, arrayOf(ID_COL),
-            "$POSITION_COl = ?",
-            arrayOf(position),
-            null, null, null
-        )
-        val id: Long? = if (cursor.moveToFirst()) {
-            cursor.getLong(cursor.getColumnIndex(ID_COL))
-        } else {
-            null
+        for (item in data) {
+            values.put(item.first, item.second)
         }
-        cursor.close()
-        db.close()
-        return id
+        database?.insert(currentTableName, null, values)
     }
 
-    @SuppressLint("Range")
-    fun getPositionById(id: Int): PositionData? {
-        val db = this.readableDatabase
-        val cursor = db.query(
-            TABLE_NAME, arrayOf(POSITION_COl, COST_COL, COUNT_COL, RES_ID_COL),
-            "$ID_COL = ?",
-            arrayOf(id.toString()),
-            null, null, null
-        )
-        val position: PositionData? = if (cursor.moveToFirst()) {
-            val name = cursor.getString(cursor.getColumnIndex(POSITION_COl))
-            val type = cursor.getString(cursor.getColumnIndex(TYPE_COL))
-            val cost = cursor.getDouble(cursor.getColumnIndex(COST_COL))
-            val count = cursor.getInt(cursor.getColumnIndex(COUNT_COL))
-            val resId = cursor.getInt(cursor.getColumnIndex(RES_ID_COL))
-            PositionData(name, type, cost, count, resId)
-        } else {
-            null
+    fun getDataFromCurrentTableWhere(columnName: String, operator: String, filterValue: String): List<List<String>> {
+        val data: MutableList<List<String>> = mutableListOf<List<String>>()
+
+        val selection = "$columnName $operator ?"
+        val selectionArgs = arrayOf(filterValue)
+
+        val cursor = database?.query(currentTableName, null, selection, selectionArgs, null, null, null)
+
+        cursor?.use {
+            val columnCount = cursor.columnCount
+            while (it.moveToNext()) {
+                val rowData = mutableListOf<String>()
+                for (i in 0 until columnCount) {
+                    val value = it.getString(i)
+                    rowData.add(value)
+                }
+                data.add(rowData)
+            }
         }
-        cursor.close()
-        db.close()
-        return position
+
+        return data
     }
 
-
-    fun updateCountById(id: Int, newCount: Int) {
-        val db = this.writableDatabase
-        val values = ContentValues()
-        values.put(COUNT_COL, newCount)
-        db.update(TABLE_NAME, values, "$ID_COL = ?", arrayOf(id.toString()))
-        db.close()
-    }
-
-    fun deleteRowById(id: Int) {
-        val db = this.writableDatabase
-        db.delete(TABLE_NAME, "$ID_COL = ?", arrayOf(id.toString()))
-        db.close()
-    }
-
-    companion object {
-        private val DATABASE_NAME = "products_db"
-        private val DATABASE_VERSION = 1
-        val TABLE_NAME = "purchases_table"
-        val ID_COL = "id"
-        val POSITION_COl = "position"
-        val TYPE_COL = "type"
-        val COST_COL = "cost"
-        val COUNT_COL = "count"
-        val RES_ID_COL = "res_id"
-    }
-
-    data class PositionData(
-        val position: String,
-        val type: String,
-        val cost: Double,
-        val count: Int,
-        val resId: Int?
-    )
 }
