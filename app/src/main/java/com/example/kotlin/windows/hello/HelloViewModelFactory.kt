@@ -2,11 +2,16 @@ package com.example.kotlin.windows.hello
 
 import android.content.Context
 import android.util.Log
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.kotlin.windows.data.Product
 import com.example.kotlin.windows.database.DBHelper
 import com.example.kotlin.windows.special.productFiled
+import com.example.kotlin.windows.special.productFiledCost
+import com.example.kotlin.windows.special.productFiledCount
+import com.example.kotlin.windows.special.productFiledImageSource
+import com.example.kotlin.windows.special.productFiledPosition
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -16,11 +21,15 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class HelloViewModelFactory(val context: Context, val dataBase: DBHelper) : ViewModelProvider.Factory {
-    val mutex = Mutex()
+class HelloViewModelFactory(
+    private val context: Context,
+    private val lifecycleOwner: LifecycleOwner,
+    private val dataBase: DBHelper
+) : ViewModelProvider.Factory {
+    private val mutex = Mutex()
 
 
-    fun load(call: Call<ResponseBody>, callback: (String?)->Unit) {
+    private fun load(call: Call<ResponseBody>, callback: (String?)->Unit) {
         call.enqueue(object : Callback<ResponseBody> {
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                 if (response.isSuccessful) {
@@ -35,10 +44,11 @@ class HelloViewModelFactory(val context: Context, val dataBase: DBHelper) : View
         })
     }
 
-    fun parser(str: String) : List<Product> {
+    private fun parser(str: String) : List<Product> {
         val mutableList = mutableListOf<Product>()
 
         var items =  str
+            .replace("\n","")
             .replace("[", "")
             .replace("\"", "")
             .replace(",", "")
@@ -62,16 +72,15 @@ class HelloViewModelFactory(val context: Context, val dataBase: DBHelper) : View
         return mutableList
     }
 
-    fun saveProductList(
+    private fun saveProductList(
         productList: List<Product>,
         tableName: String,
         tableFiled: List<Pair<String, String>>,
         reset: Boolean = false
     ) {
-        Log.e("MyT", "saveProductList")
         CoroutineScope(Dispatchers.IO).launch {
             mutex.lock()
-            Log.e("MyT", "mutex lock")
+            Log.v("SOG", "FUN saveProductList -> mutex lock")
             try {
                 dataBase.selectTable(tableName, tableFiled)
 
@@ -83,24 +92,25 @@ class HelloViewModelFactory(val context: Context, val dataBase: DBHelper) : View
                         getWritableProduct(product)
                     )
             } finally {
-                Log.e("MyT", "mutex unlock")
+                Log.v("SOG", "FUN saveProductList -> mutex unlock")
                 mutex.unlock()
             }
         }
     }
 
-    fun getWritableProduct(product: Product): List<Pair<String,String>> {
+    private fun getWritableProduct(product: Product): List<Pair<String,String>> {
         return listOf(
-            Pair(productFiled[0].first, product.position),
-            Pair(productFiled[1].first, product.cost),
-            Pair(productFiled[2].first, product.count),
-            Pair(productFiled[3].first, product.imageSrc)
+            Pair(productFiledPosition, product.position),
+            Pair(productFiledCost, product.cost),
+            Pair(productFiledCount, product.count),
+            Pair(productFiledImageSource, product.imageSrc)
         )
     }
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return HelloViewModel(
             context = context,
+            lifecycleOwner = lifecycleOwner,
             load = ::load,
             parser = ::parser,
             saveProductList = ::saveProductList

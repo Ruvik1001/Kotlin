@@ -4,11 +4,11 @@ import android.app.AlertDialog
 import android.content.Context
 import android.widget.Toast
 
-fun createAlert(
+fun makeAlert(
     context: Context,
     title: String = "",
     message: String = "",
-    buttonsList: List<Pair<String, ()->Unit>> = listOf()
+    buttonsList: List<Pair<String, ()->Unit>> = listOf(Pair("Ок", {}))
 ) {
     val builder = AlertDialog.Builder(context)
     builder.setTitle(title)
