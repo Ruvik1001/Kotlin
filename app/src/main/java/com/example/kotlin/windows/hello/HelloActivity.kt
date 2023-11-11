@@ -18,6 +18,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import okhttp3.ResponseBody
 import org.koin.android.ext.android.inject
+import org.koin.core.parameter.parametersOf
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -31,11 +32,16 @@ class HelloActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_hello)
 
-        val factory : HelloViewModelFactory by inject()
+        val factory : HelloViewModelFactory by inject{ parametersOf(this) }
         val helloViewModel = ViewModelProvider(this, factory).get(HelloViewModel::class.java)
+        helloViewModel.loadProduct()
 
         Thread {
-            Thread.sleep(1300)
+            Thread.sleep(2300)
+            while (!helloViewModel.allLoaded()) {
+                Thread.sleep(300)
+            }
+
             runOnUiThread{
                 startActivity(Intent(this, HostWindowActivity::class.java))
                 finish()

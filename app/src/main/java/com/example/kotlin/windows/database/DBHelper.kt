@@ -81,6 +81,9 @@ class DBHelper(private val context: Context) {
         return data
     }
 
+    fun getAllDataFromCurrentTableByCursor(): Cursor? {
+        return database?.rawQuery("SELECT * FROM $currentTableName;", null)
+    }
 
     fun addDataToCurrentTable(data: List<Pair<String, String>>) {
         val values = ContentValues()
@@ -112,5 +115,43 @@ class DBHelper(private val context: Context) {
 
         return data
     }
+
+    fun getDataFromCurrentTableWhereByCursor(columnName: String, operator: String, filterValue: String): Cursor? {
+        val selection = "$columnName $operator ?"
+        val selectionArgs = arrayOf(filterValue)
+        return database?.query(currentTableName, null, selection, selectionArgs, null, null, null)
+    }
+
+    fun updateColumnById(id: Int, columnName: String, value: String) {
+        val values = ContentValues()
+        values.put(columnName, value)
+
+        val whereClause = "id = ?"
+        val whereArgs = arrayOf(id.toString())
+
+        database?.update(currentTableName, values, whereClause, whereArgs)
+    }
+
+    fun getId(cursor: Cursor): Int {
+        val idColumnIndex = cursor.getColumnIndex("id")
+        return cursor.getInt(idColumnIndex)
+    }
+
+    fun setAllRecordWhere(
+        column: String,
+        operator: String,
+        value: String,
+        columnTarget: String,
+        newValue: String
+    ) {
+        val values = ContentValues()
+        values.put(columnTarget, newValue)
+
+        val whereClause = "$column $operator ?"
+        val whereArgs = arrayOf(value)
+
+        database?.update(currentTableName, values, whereClause, whereArgs)
+    }
+
 
 }
